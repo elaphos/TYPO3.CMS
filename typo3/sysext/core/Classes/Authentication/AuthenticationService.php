@@ -201,6 +201,7 @@ class AuthenticationService extends AbstractAuthenticationService
             // Failed login attempt - wrong password
             $this->writeLogMessage(TYPO3_MODE . ' Authentication failed - wrong password for username \'%s\'', $submittedUsername);
             $message = 'Login-attempt from ###IP###, username \'%s\', password not accepted!';
+            $this->writeLogMessage($message, $submittedUsername);
             $this->writelog(255, 3, 3, 1, $message, [$submittedUsername]);
             $this->logger->info(sprintf($message, $submittedUsername));
             // Responsible, authentication failed, do NOT check other services
@@ -388,6 +389,7 @@ class AuthenticationService extends AbstractAuthenticationService
      *
      * This function accepts variable number of arguments and can format
      * parameters. The syntax is the same as for sprintf()
+     * If a marker ###IP### is present in the message, it is automatically replaced with the REMOTE_ADDR
      *
      * @param string $message Message to output
      * @param array<int, mixed> $params
@@ -397,6 +399,7 @@ class AuthenticationService extends AbstractAuthenticationService
         if (!empty($params)) {
             $message = vsprintf($message, $params);
         }
+        $message = str_replace('###IP###', (string)GeneralUtility::getIndpEnv('REMOTE_ADDR'), $message);
         if (TYPO3_MODE === 'FE') {
             $timeTracker = GeneralUtility::makeInstance(TimeTracker::class);
             $timeTracker->setTSlogMessage($message);
