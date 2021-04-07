@@ -388,6 +388,7 @@ class AuthenticationService extends AbstractAuthenticationService
      *
      * This function accepts variable number of arguments and can format
      * parameters. The syntax is the same as for sprintf()
+     * If a marker ###IP### is present in the message, it is automatically replaced with the REMOTE_ADDR
      *
      * @param string $message Message to output
      * @param array<int, mixed> $params
@@ -397,6 +398,7 @@ class AuthenticationService extends AbstractAuthenticationService
         if (!empty($params)) {
             $message = vsprintf($message, $params);
         }
+        $message = str_replace('###IP###', (string)GeneralUtility::getIndpEnv('REMOTE_ADDR'), $message);
         if (TYPO3_MODE === 'FE') {
             $timeTracker = GeneralUtility::makeInstance(TimeTracker::class);
             $timeTracker->setTSlogMessage($message);
